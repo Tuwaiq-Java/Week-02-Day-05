@@ -1,0 +1,749 @@
+package com.example.exesrsies.controoller;
+
+import com.example.exesrsies.model.Advisor;
+import com.example.exesrsies.model.RequestApi;
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.servises.Advisorservises;
+import com.example.exesrsies.servises.Strudentservises;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/Advisor")
+@RequiredArgsConstructor
+public class Advaisorcontrooller {
+    private final Advisorservises advisorservises;
+
+    //get
+    @GetMapping
+    public ResponseEntity<ArrayList<Advisor>> getAdvasior() {
+        return ResponseEntity.status(200).body(advisorservises.getAdvisor());
+
+    }
+
+    //post
+    @PostMapping
+    public ResponseEntity<RequestApi> addAdvisor(@RequestBody @Valid Advisor advisor, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isasvisortAdded = advisorservises.addAdvisor(advisor);
+        if (!isasvisortAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a Advisor", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New student Advisor", 200));
+    }
+
+    @PutMapping("/{index}")
+    public ResponseEntity update(@PathVariable int index, @RequestBody Advisor advisor,Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isasvisortAdded  = advisorservises.updateAdvisor(index, advisor);
+        if (!isasvisortAdded ) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+        }
+        return ResponseEntity.status(201).body(new RequestApi("update Advisor", 200));
+
+    }
+    //delet
+    @DeleteMapping("/{index}")
+    public ResponseEntity<RequestApi> delete(@PathVariable Integer index) {
+  boolean isasvisortAdded =advisorservises.dAdvisor(index);
+   if(!isasvisortAdded ) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+}
+        return ResponseEntity.status(201).body(new RequestApi("delet Advisor", 200));
+
+}
+
+
+}
+
+
+////////
+package com.example.exesrsies.controoller;
+
+import com.example.exesrsies.model.RequestApi;
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.servises.Strudentservises;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/student")
+@RequiredArgsConstructor
+public class Studentcontrooller {
+    private final Strudentservises strudentservises;
+
+    //get
+    @GetMapping
+    public ResponseEntity<ArrayList<Student>> getStudent() {
+        return ResponseEntity.status(200).body(strudentservises.getStudent());
+
+    }
+
+    //post
+    @PostMapping
+    public ResponseEntity<RequestApi> addBook(@RequestBody @Valid Student student, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isstudentAdded = strudentservises.addStudent(student);
+        if (!isstudentAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a student", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New student added", 200));
+    }
+
+    @PutMapping("/{index}")
+    public ResponseEntity update(@PathVariable int index, @RequestBody Student student ,Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isstudentupdate = strudentservises.updateStudent(index, student);
+        if (!isstudentupdate) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+        }
+        return ResponseEntity.status(201).body(new RequestApi("update student", 200));
+
+    }
+    //delet
+    @DeleteMapping("/{index}")
+    public ResponseEntity<RequestApi> delete(@PathVariable Integer index) {
+  boolean isstudentremove=strudentservises.dStudent(index);
+   if(!isstudentremove) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+}
+        return ResponseEntity.status(201).body(new RequestApi("delet student", 200));
+
+}
+@PostMapping("/addSubject/{id1}/{id2}")
+    public ResponseEntity<RequestApi> addSubject(@PathVariable String studentid,@PathVariable String subjectid) {
+
+        boolean isstudentAdded = strudentservises.addCourse(studentid,subjectid);
+        if (!isstudentAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a student id, subject id", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New added student in arraylist", 200));
+    }
+    @PutMapping("/change/{id}/{major}")
+    public ResponseEntity<RequestApi> changemajor(@RequestParam String studentid, @RequestParam String major){
+        Integer change=strudentservises.changeMajor(studentid,major);
+
+        switch (change){
+            case -1:
+                return ResponseEntity.status(400).body(new RequestApi("studentid is not valid",400));
+            case 0:
+                return ResponseEntity.status(400).body(new RequestApi("major is not valid",400));
+            case 1:
+                return ResponseEntity.status(400).body(new RequestApi("change major",400));
+            default:
+                return ResponseEntity.status(500).body(new RequestApi("Server error",500));
+        }
+
+    }
+    @PostMapping("/studentlist/{id1}")
+    public ResponseEntity<RequestApi> studentliste(@PathVariable String courseid) {
+        ArrayList<Student>  ischeck = strudentservises.studentlist(courseid);
+        if ( ischeck==null) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding ", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("found ", 200));
+    }
+
+
+    @PostMapping("/getadvaisor/{id1}")
+    public ResponseEntity<RequestApi> getadvaisor(@PathVariable String advisorid) {
+        ArrayList<Student> ischeck = strudentservises.studentlist(advisorid);
+        if (ischeck==null) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding ", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("found ", 200));
+    }
+
+}
+
+
+////////
+package com.example.exesrsies.controoller;
+
+import com.example.exesrsies.model.RequestApi;
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.model.Subject;
+import com.example.exesrsies.servises.Strudentservises;
+import com.example.exesrsies.servises.Subjectservises;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/subject")
+@RequiredArgsConstructor
+public class Subjectcontrooller {
+    private final Subjectservises subjectservises;
+
+    //get
+    @GetMapping
+    public ResponseEntity<ArrayList<Subject>> getSubject() {
+        return ResponseEntity.status(200).body(subjectservises.getSubjects());
+
+    }
+
+    //post
+    @PostMapping
+    public ResponseEntity<RequestApi> addSubject(@RequestBody @Valid Subject subject, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean issubjectAdded = subjectservises.addSubject(subject);
+        if (!issubjectAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a subject", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New subject added", 200));
+    }
+
+    @PutMapping("/{index}")
+    public ResponseEntity update(@PathVariable int index, @RequestBody Subject subject,Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean issubjectubdate= subjectservises.updateSubject(index, subject);
+        if (!issubjectubdate) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+        }
+        return ResponseEntity.status(201).body(new RequestApi("update subject", 200));
+
+    }
+    //delet
+    @DeleteMapping("/{index}")
+    public ResponseEntity<RequestApi> delete(@PathVariable Integer index) {
+  boolean issubjectremove=subjectservises.dSubject(index);
+   if(!issubjectremove) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+}
+        return ResponseEntity.status(201).body(new RequestApi("delet subject", 200));
+
+}
+
+
+}
+
+
+///////
+package com.example.exesrsies.controoller;
+
+import com.example.exesrsies.model.RequestApi;
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.model.Teacher;
+import com.example.exesrsies.servises.Strudentservises;
+import com.example.exesrsies.servises.Teacherservises;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/teacher")
+@RequiredArgsConstructor
+public class Teachercontrooller {
+    private final Teacherservises teacherservises;
+
+    //get
+    @GetMapping
+    public ResponseEntity<ArrayList<Teacher>> getTeacher() {
+        return ResponseEntity.status(200).body(teacherservises.getTeacher());
+
+    }
+
+    //post
+    @PostMapping
+    public ResponseEntity<RequestApi> addTeacher(@RequestBody @Valid Teacher teacher, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isteacherAdded = teacherservises.addTeacher(teacher);
+        if (!isteacherAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a teacher", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New teacher added", 200));
+    }
+
+    @PutMapping("/{index}")
+    public ResponseEntity update(@PathVariable int index, @RequestBody Teacher teacher,Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequestApi(errors.getFieldError().getDefaultMessage(), 400));
+        }
+        boolean isteacherupdate = teacherservises.updateTeacher(index, teacher);
+        if (!isteacherupdate) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+        }
+        return ResponseEntity.status(201).body(new RequestApi("update teacher", 200));
+
+    }
+    //delet
+    @DeleteMapping("/{index}")
+    public ResponseEntity<RequestApi> delete(@PathVariable Integer index) {
+  boolean isteacherremove=teacherservises.dTeacher(index);
+        if(!isteacherremove) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestApi("invalid id", 400));
+}
+        return ResponseEntity.status(201).body(new RequestApi("delet teacher", 200));
+
+}
+    @PostMapping("/addteacher/{id1}/{id2}")
+    public ResponseEntity<RequestApi> addTeacher(@PathVariable String studentid,@PathVariable String subjectid) {
+
+        boolean isstudentAdded = teacherservises.addTeacher(studentid,subjectid);
+        if (!isstudentAdded) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding a teacher id, subject id", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("New added teacher in arraylist", 200));
+    }
+    @PostMapping("/checkcourse/{id1}")
+    public ResponseEntity<RequestApi> checkcourse(@PathVariable String courseid) {
+
+        String isstudentAdded = teacherservises.teacherName(courseid);
+        if (isstudentAdded==null) {
+            return ResponseEntity.status(500).body(new RequestApi("Error adding ", 500));
+
+        }
+        return ResponseEntity.status(200).body(new RequestApi("found teacher name", 200));
+    }
+
+}
+
+
+
+
+
+///////
+package com.example.exesrsies.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+
+@AllArgsConstructor @Data
+public class Advisor {
+
+    @NotEmpty(message = "id shoulde be requied")
+    private String id;
+    @NotEmpty(message = "name shoulde be requied")
+    private  String name;
+    @NotNull(message ="name shoulde be requied" )
+    private  int age;
+}
+
+
+
+//////
+package com.example.exesrsies.model;
+
+public class RequestApi {
+    private String massege;
+    private int statuse;
+
+    public RequestApi(String massege, int statuse) {
+        this.massege = massege;
+        this.statuse = statuse;
+    }
+
+    public String getMassege() {
+        return massege;
+    }
+
+    public void setMassege(String massege) {
+        this.massege = massege;
+    }
+
+    public int getStatuse() {
+        return statuse;
+    }
+
+    public void setStatuse(int statuse) {
+        this.statuse = statuse;
+    }
+}
+
+
+
+
+///////
+package com.example.exesrsies.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import javax.validation.constraints.*;
+import java.util.ArrayList;
+
+ @Data
+public class Student {
+
+    @NotEmpty(message = "id shoulde be requied")
+    private String id;
+    @NotEmpty(message = "name shoulde be requied")
+    private  String name;
+    @NotNull(message ="name shoulde be requied" )
+    private  int age;
+    private ArrayList classList;
+    @NotEmpty(message = "advisorName shoulde be requied")
+    private String advisorName;
+    @NotEmpty(message = "advisorName shoulde be requied")
+    private String major;
+
+     public Student(String id, String name, int age, String advisorName, String major) {
+         this.id = id;
+         this.name = name;
+         this.age = age;
+         this.classList = classList;
+         this.advisorName = advisorName;
+         this.major = major;
+     }
+ }
+
+
+
+///////
+package com.example.exesrsies.model;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+
+@Data
+public class Subject {
+   @NotEmpty(message = "id shoulde be requied")
+   private String id;
+   @NotEmpty(message = "name shoulde be requied")
+   private  String name;
+
+}
+
+
+//////
+package com.example.exesrsies.model;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+
+@Data
+public class Teacher {
+   @NotEmpty(message = "id shoulde be requied")
+   private String id;
+   @NotEmpty(message = "name shoulde be requied")
+   private  String name;
+   private ArrayList classList;
+
+   public Teacher(String id, String name) {
+      this.id = id;
+      this.name = name;
+      this.classList = new ArrayList<>();
+   }
+
+}
+
+
+//////
+package com.example.exesrsies.servises;
+
+
+import com.example.exesrsies.model.Advisor;
+import com.example.exesrsies.model.Student;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+
+public class Advisorservises {
+    private ArrayList<Advisor> advisors=new ArrayList();
+
+    //get
+    public ArrayList<Advisor> getAdvisor(){
+        return advisors;
+    }
+    //add
+    public boolean addAdvisor(Advisor  advisor) {
+        return advisors.add(advisor);
+    }
+    //update
+    public boolean updateAdvisor(int index,Advisor advisor) {
+        advisors.set(index,advisor);
+        return true;
+    }
+    //deleat
+    public boolean dAdvisor(int index) {
+        advisors.remove(index);
+        return true;
+    }
+}
+
+//////
+package com.example.exesrsies.servises;
+
+
+import com.example.exesrsies.model.Advisor;
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.model.Subject;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+public class Strudentservises {
+    private ArrayList<Student> students=new ArrayList();
+private final Strudentservises strudentservises;
+    private final Subjectservises subjectservises;
+private final Advisorservises advisorservises;
+
+    //get
+    public ArrayList<Student> getStudent(){
+        return  students;
+    }
+    //add
+    public boolean addStudent(Student student) {
+        return students.add(student);
+    }
+    //update
+    public boolean updateStudent(int index,Student student) {
+        students.set(index,student);
+        return true;
+    }
+    //deleat
+    public boolean dStudent(int index) {
+        students.remove(index);
+        return true;
+    }
+    public boolean addCourse(String studentid, String courseid) {
+        getStudent(studentid).getClassList().add(subjectservises.getSubject(courseid));
+
+        return true;
+    }
+
+
+    public Student getStudent(String studentid){
+        for (Student student:students) {
+            if(student.getId().equals(student)){
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public Student getMajor(String major){
+        for (Student student:students) {
+            if(student.getId().equals(student)){
+                return student;
+
+            }
+        }
+        return null;
+    }
+    public Integer changeMajor(String id,String major){
+     Student s=strudentservises.getStudent(id);
+      Student m=strudentservises.getMajor(major);
+      if(s==null){
+          return -1;
+      }
+      if(m==null){
+          return 0;
+      }
+       s.setMajor(major);
+      s.getClassList().clear();
+      return 1;
+    }
+
+
+    public ArrayList<Student> studentlist(String classid) {
+        ArrayList<Student> studentcalss= new ArrayList<>();
+        for (int i = 0; i < students.size(); i++) {
+            Student s = students.get(i);
+           // ArrayList<Class> studentlist= s.getClassList();
+            for (int j = 0; j < students.get(j).getClassList().size(); j++) {
+                if (students.get(i).getId().equals(classid)) {
+                    students.add(s);
+                }
+            }
+        }
+        return studentcalss;
+    }
+
+    public ArrayList<Student> getAdvisor(String advisorid) {
+        ArrayList<Student> ss= new ArrayList<>();
+        ArrayList<Advisor> advisors = advisorservises.getAdvisor();
+        for (int i = 0; i < students.size(); i++) {
+            Student student = students.get(i);
+            for (int j = 0; j < advisors.size(); j++) {
+                if (student.getAdvisorName().equals(advisors.get(j).getName())){
+                   ss.add(student);
+                }
+            }
+        }
+        return ss;
+    }
+}
+
+////////
+package com.example.exesrsies.servises;
+
+
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.model.Subject;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+
+public class Subjectservises {
+    private ArrayList<Subject> subjects=new ArrayList();
+
+    //get
+    public ArrayList<Subject> getSubjects(){
+
+        return  subjects;
+    }
+    //add
+    public boolean addSubject(Subject subject) {
+
+        return subjects.add(subject);
+    }
+    //update
+    public boolean updateSubject(int index,Subject subject) {
+        subjects.set(index,subject);
+        return true;
+    }
+    //deleat
+    public boolean dSubject(int index) {
+        subjects.remove(index);
+        return true;
+    }
+
+    public Subject getSubject(String subjectid){
+        for (Subject subject:subjects) {
+            if(subject.getId().equals(subjectid)){
+                return subject;
+            }
+        }
+        return null;
+    }
+}
+
+//////
+package com.example.exesrsies.servises;
+
+
+import com.example.exesrsies.model.Student;
+import com.example.exesrsies.model.Teacher;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+//@AllArgsConstructor
+
+public class Teacherservises {
+    private final Strudentservises strudentservises;
+
+    private final Subjectservises subjectservises;
+    private ArrayList<Teacher> teachers=new ArrayList();
+
+    //get
+    public ArrayList<Teacher> getTeacher(){
+        return teachers;
+    }
+    //add
+    public boolean addTeacher(Teacher teacher) {
+
+        return teachers.add(teacher);
+    }
+    //update
+    public boolean updateTeacher(int index,Teacher teacher) {
+        teachers.set(index,teacher);
+        return true;
+    }
+    //deleat
+    public boolean dTeacher(int index) {
+        teachers.remove(index);
+        return true;
+    }
+    public boolean addTeacher(String studentid, String courseid) {
+  strudentservises.getStudent(studentid).getClassList().add(subjectservises.getSubject(courseid));
+
+        return true;
+    }
+
+  public String teacherName(String courseid)  {
+        int j=0;
+        String s=null;
+        for(int i=0;i<teachers.size();i++){
+            for(j=0;j<teachers.get(j).getClassList().size();j++){
+                if(teachers.get(i).getName().equals(teachers.get(j).getName()))
+                {
+                    s= teachers.get(j).getName();
+
+                }
+            }
+            return s;
+
+        }
+        return null;
+  }
+
+
+}
+
+
+
