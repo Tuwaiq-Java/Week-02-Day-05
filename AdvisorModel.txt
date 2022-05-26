@@ -1,0 +1,18 @@
+package com.example.demo.Modele;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
+@Data
+@AllArgsConstructor
+public class AdvisorModel {
+    @NotEmpty(message = "Must Be Write")
+    @Size(min = 7)
+    private Integer ID;
+    @NotEmpty(message = "Must Be Write")
+    private String name;
+    @NotEmpty(message = "Must Be Write")
+    private Integer age;
+}

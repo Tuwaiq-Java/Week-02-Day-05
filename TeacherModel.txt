@@ -1,0 +1,12 @@
+package com.example.demo.Modele;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.ArrayList;
+@AllArgsConstructor @Data
+public class TeacherModel {
+    private Integer ID;
+    private String name;
+    private ArrayList classList;
+}

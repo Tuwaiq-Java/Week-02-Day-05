@@ -1,0 +1,15 @@
+package com.example.demo.Modele;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+@Data
+@AllArgsConstructor
+public class ClassModel {
+    @NotEmpty(message = "Data required")
+    private Integer ID;
+    @NotEmpty(message = "Data required")
+    private String name;
+
+}

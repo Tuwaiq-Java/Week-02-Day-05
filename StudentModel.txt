@@ -1,0 +1,27 @@
+package com.example.demo.Modele;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+
+@Data
+@AllArgsConstructor
+public class StudentModel {
+    @NotEmpty(message = "Must Be Write")
+    @Size(min = 7)
+    private Integer ID;
+    @NotEmpty(message = "Must Be Write")
+    private String name;
+    @NotEmpty(message = "Must Be Write")
+    private Integer age;
+    @NotEmpty(message = "Must Be Write")
+    private String major;
+    @NotEmpty(message = "Must Be Write")
+    private String advisorName;
+    @NotEmpty(message = "Must Be Write")
+    private ArrayList classList;
+
+}
